@@ -1,0 +1,8 @@
+fastapi
+setuptools
+uvicorn
+yoyo-migrations
+psycopg[binary]
+podgen
+aiohttp
+aiohttp-client-cache
