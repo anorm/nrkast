@@ -7,7 +7,7 @@ async def main():
     async with (
         factory.produce("scraper") as scraper
     ):
-        await scraper.scrape("radiodokumentaren")
+        print(await scraper.scrape("radiodokumentaren/seasons/svindler-i-guds-navn"))
 
 
 if __name__ == "__main__":

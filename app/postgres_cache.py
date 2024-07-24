@@ -1,59 +1,36 @@
-from aiohttp_client_cache.backends import BaseCache, CacheBackend, ResponseOrKey
-from typing import AsyncIterable
+from psycopg import sql
 from psycopg.rows import dict_row
 
 
-class PostgresCache(CacheBackend):
-    """Wrapper for higher-level cache operations. In most cases, the only thing you need
-    to specify here is which storage class(es) to use.
-    """
-    def __init__(self, *, logger, db_connection, **kwargs):
-        super().__init__(**kwargs)
-        self.logger = logger
-        self.redirects = PostgresStorage(logger=logger, db_connection=db_connection, **kwargs)
-        self.responses = PostgresStorage(logger=logger, db_connection=db_connection, **kwargs)
-
-
-class PostgresStorage(BaseCache):
+class PostgresCache:
     """interface for lower-level backend storage operations"""
-    def __init__(self, *, logger, db_connection, **kwargs):
+    def __init__(self, *, logger, db_connection, table, key_column="key", value_column="value", **kwargs):
         super().__init__(**kwargs)
         self.logger = logger
         self.db_connection = db_connection
+        self.table = table
+        self.key_column = key_column
+        self.value_column = value_column
 
-    async def contains(self, key: str) -> bool:
-        raise NotImplementedError()
-
-    async def clear(self):
-        raise NotImplementedError()
-
-    async def delete(self, key: str):
-        raise NotImplementedError()
-
-    async def bulk_delete(self, keys: set):
-        raise NotImplementedError()
-
-    async def keys(self) -> AsyncIterable[str]:
-        raise NotImplementedError()
-
-    async def read(self, key: str) -> ResponseOrKey:
+    async def get(self, key: str):
         async with self.db_connection.cursor(row_factory=dict_row) as cur:
-            await cur.execute("SELECT key,value FROM http_cache WHERE key = %s", (key,))
+            await cur.execute(
+                sql.SQL("SELECT {keycol},{valcol} FROM {table} WHERE key = %s").format(
+                    table=sql.Identifier(self.table),
+                    keycol=sql.Identifier(self.key_column),
+                    valcol=sql.Identifier(self.value_column)),
+                (key,))
             item = await cur.fetchone()
             if item:
-                return self.deserialize(item["value"])
+                return item["value"]
             else:
                 return None
 
-    async def size(self) -> int:
-        raise NotImplementedError()
-
-    def values(self) -> AsyncIterable[ResponseOrKey]:
-        raise NotImplementedError()
-
-    async def write(self, key: str, item: ResponseOrKey):
-        self.logger.info(f"write {key}")
+    async def set(self, key: str, value):
         async with self.db_connection.cursor() as cur:
             await cur.execute(
-                "INSERT INTO http_cache (key, value) VALUES (%s, %s) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value",
-                (key, self.serialize(item) or ""))
+                sql.SQL("INSERT INTO {table} ({keycol}, {valcol}) VALUES (%s, %s) ON CONFLICT ({keycol}) DO UPDATE SET {valcol} = EXCLUDED.{valcol}").format(
+                    table=sql.Identifier(self.table),
+                    keycol=sql.Identifier(self.key_column),
+                    valcol=sql.Identifier(self.value_column)),
+                (key, value))
