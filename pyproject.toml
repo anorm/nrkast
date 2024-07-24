@@ -1,0 +1,25 @@
+[project]
+name = "nrkast"
+dynamic = ["version"]
+dependencies = [
+    "aiohttp",
+    "aiohttp-client-cache",
+    "asyncclick",
+    "fastapi",
+    "podgen",
+    "psycopg[binary]",
+    "setuptools",
+    "uvicorn",
+    "yoyo-migrations"]
+requires-python = ">3.9"
+
+[project.scripts]
+nrkast = "nrkast.cli:main"
+
+[build-system]
+requires = [
+    "setuptools",
+    "setuptools-scm>=8.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]

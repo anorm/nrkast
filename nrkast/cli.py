@@ -1,4 +1,3 @@
-import asyncio
 import asyncclick as click
 from . import factory
 

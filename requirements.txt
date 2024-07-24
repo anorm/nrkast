@@ -1,9 +1,0 @@
-aiohttp
-aiohttp-client-cache
-asyncclick
-fastapi
-podgen
-psycopg[binary]
-setuptools
-uvicorn
-yoyo-migrations
