@@ -1,8 +1,9 @@
+aiohttp
+aiohttp-client-cache
+asyncclick
 fastapi
+podgen
+psycopg[binary]
 setuptools
 uvicorn
 yoyo-migrations
-psycopg[binary]
-podgen
-aiohttp
-aiohttp-client-cache

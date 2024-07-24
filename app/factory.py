@@ -74,10 +74,10 @@ async def produce(entry, **kwargs):
         key = entry
 
     if key in container:
-        logging.info(f"Using cached {key}")
+        logging.debug(f"Using cached {key}")
         yield container[key]
     else:
-        logging.info(f"Producing {key}")
+        logging.debug(f"Producing {key}")
 
         async with globals()[f"produce_{entry}"](**kwargs) as ret:
             container[key] = ret

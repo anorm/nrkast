@@ -22,10 +22,12 @@ class Scraper:
     async def _scrape_episode(self, data):
         id = data["episodeId"]
 
+        # Check cache first
         cached_xml = await self.episode_cache.get(id)
         if cached_xml:
             return cached_xml
 
+        # Not in cache, build the Episode object
         episode = Episode()
         episode.id = id
         episode.title = data.get("titles", {}).get("title", "missing title")
@@ -44,14 +46,19 @@ class Scraper:
         media = Media.create_from_server_response(playable_data["playable"]["assets"][0]["url"],
                                                   duration=datetime.timedelta(seconds=data["durationInSeconds"]))
         episode.media = media
+        self.logger.info(f"Found new episode {id}")
+
+        # Turn into an XML string
         xmlString = etree.tostring(episode.rss_entry(), encoding="UTF-8").decode("UTF-8")
+
+        # Put it in the cache
         await self.episode_cache.set(id, xmlString)
 
         return xmlString
 
     async def scrape(self, slug):
         url = self._get_podcast_url(slug)
-        self.logger.info(f"Scraping {slug} from {url}")
+        self.logger.debug(f"Scraping {slug} from {url}")
 
         response = await self.http_session.get(url)
         response.raise_for_status()

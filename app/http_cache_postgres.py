@@ -52,7 +52,6 @@ class HttpCachePostgresStorage(BaseCache):
         raise NotImplementedError()
 
     async def write(self, key: str, item: ResponseOrKey):
-        self.logger.info(f"write {key}")
         async with self.db_connection.cursor() as cur:
             await cur.execute(
                 "INSERT INTO http_cache (key, value) VALUES (%s, %s) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;",

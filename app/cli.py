@@ -1,17 +1,21 @@
 import asyncio
-
+import asyncclick as click
 from . import factory
 
 
+@click.group()
 async def main():
+    pass
+
+
+@main.command(help="Generate RSS feed")
+@click.argument("slug")
+async def rss(slug):
     async with (
         factory.produce("scraper") as scraper
     ):
-        print(await scraper.scrape("radiodokumentaren/seasons/svindler-i-guds-navn"))
+        print(await scraper.scrape(slug))
 
 
 if __name__ == "__main__":
-    print("-"*50)
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    loop.run_until_complete(main())
+    main(_anyio_backend="asyncio")
