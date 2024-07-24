@@ -75,7 +75,7 @@ class Scraper:
             podcast.image = images[-1].get("url") + ".jpeg"
 
         # Find episodes
-        url = f"{self.base_url}{podcast_data["_links"]["episodes"]["href"]}"
+        url = f'{self.base_url}{podcast_data["_links"]["episodes"]["href"]}'
         xmlStringEpisodes = []
         while True:
             response = await self.http_session.get(url)
