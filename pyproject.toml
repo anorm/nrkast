@@ -11,7 +11,7 @@ dependencies = [
     "setuptools",
     "uvicorn",
     "yoyo-migrations"]
-requires-python = ">3.9"
+requires-python = ">3.11"
 
 [project.scripts]
 nrkast = "nrkast.cli:main"
