@@ -5,7 +5,7 @@ services:
     plan: free
     region: frankfurt
     branch: main
-    healthCheckPath: /healthz
+    healthCheckPath: /ping
     envVars:
       - key: PORT
         value: 8080
