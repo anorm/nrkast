@@ -3,11 +3,11 @@ from contextlib import asynccontextmanager
 import logging
 from aiohttp_client_cache import CachedSession
 import psycopg
+import os
 
 from .scraper import Scraper
 from .http_cache_postgres import HttpCachePostgres
 from .postgres_cache import PostgresCache
-
 container = {}
 
 
@@ -25,7 +25,7 @@ async def produce_logger(name):
 
 @asynccontextmanager
 async def produce_db_connection():
-    async with await psycopg.AsyncConnection.connect("postgresql://postgres:foobar@127.0.0.1/nrkast",
+    async with await psycopg.AsyncConnection.connect(os.getenv("DB_CONNECTION", "postgresql://postgres:foobar@127.0.0.1/nrkast"),
                                                      autocommit=True) as conn:
         yield conn
 
