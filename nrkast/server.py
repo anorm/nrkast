@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Response, status, Request
 from contextlib import asynccontextmanager
 
 from . import factory
@@ -19,7 +19,11 @@ app = FastAPI(lifespan=lifespan)
 def ping():
     return "OK"
 
-@app.get("/{slug}")
+@app.get("/rss/{slug}")
 async def scrape(slug):
     body = await scraper.scrape(slug)
     return Response(content=body, media_type="text/xml")
+
+@app.api_route("/{path_name:path}")
+async def catch_all(request: Request, path_name: str):
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
