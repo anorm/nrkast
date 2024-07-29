@@ -8,6 +8,7 @@ TAG=$1
 
 docker buildx build \
     --platform linux/amd64 \
+    --pull \
     --push \
     -t $REGISTRY/$IMAGE:latest \
     -t $REGISTRY/$IMAGE:$TAG \
