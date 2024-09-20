@@ -28,7 +28,8 @@ class HttpCachePostgresStorage(BaseCache):
         raise NotImplementedError()
 
     async def delete(self, key: str):
-        raise NotImplementedError()
+        async with self.db_connection.cursor(row_factory=dict_row) as cur:
+            await cur.execute("DELETE FROM http_cache WHERE key = %s", (key,))
 
     async def bulk_delete(self, keys: set):
         raise NotImplementedError()

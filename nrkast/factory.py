@@ -35,7 +35,7 @@ async def produce_http_session():
     async with (
         produce("logger", name="cache") as logger,
         produce("db_connection") as db_connection,
-        CachedSession(cache=HttpCachePostgres(logger=logger, db_connection=db_connection, expire_after=5*60*60)) as session
+        CachedSession(cache=HttpCachePostgres(logger=logger, db_connection=db_connection, expire_after=60*60)) as session
     ):
         # logging.getLogger('aiohttp_client_cache').setLevel('DEBUG')
         yield session
